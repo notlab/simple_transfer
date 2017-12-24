@@ -131,6 +131,10 @@ def build_optimizer(output_size):
     
 ## Style transfer
 def stylize(content_img, style_img, nsteps=500, content_weight=1, style_weight=1000):
+    print('Setting threads...')
+    torch.set_num_threads(32)
+    print('Number threads set to: %f' % torch.get_num_threads())
+    
     print('Building model...')
 
     model, content_losses, style_losses = build_model(content_img, style_img, content_weight=content_weight, style_weight=style_weight)
