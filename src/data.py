@@ -15,6 +15,11 @@ BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 CONTENT_PATH = os.path.join(BASE_PATH, '../data/images/content.jpg')
 STYLE_PATH = os.path.join(BASE_PATH, '../data/images/style.jpg')
 
+def load_content_image():
+    return load_image(CONTENT_PATH)
+
+def load_style_image():
+    return load_image(STYLE_PATH)
 
 def load_image(image_path):
     loader = tv.transforms.Compose([tv.transforms.Resize(IMSIZE), tv.transforms.ToTensor()])
