@@ -22,7 +22,7 @@ def load_style_image():
     return load_image(STYLE_PATH)
 
 def load_image(image_path):
-    loader = tv.transforms.Compose([tv.transforms.Resize(IMSIZE), tv.transforms.ToTensor()])
+    loader = tv.transforms.Compose([tv.transforms.Resize((IMSIZE, IMSIZE)), tv.transforms.ToTensor()])
     pil_image = Image.open(image_path)
     image = autograd.Variable(loader(pil_image)).unsqueeze(0)
     return image.type(DTYPE)
