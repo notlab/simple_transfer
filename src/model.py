@@ -80,7 +80,7 @@ def build_model(content_img, style_img, content_weight=1, style_weight=1000, con
             layer_name = 'conv_' + str(conv_i)
             model.add_module(layer_name, layer)
             conv_i += 1
-
+            
             if layer_name in content_layers:
                 target = model(content_img).clone()
                 content_loss = ContentLoss(target, content_weight)
@@ -121,7 +121,7 @@ def build_model(content_img, style_img, content_weight=1, style_weight=1000, con
             model.add_module(layer_name, layer)
             pool_i += 1
 
-        return model, content_losses, style_losses
+    return model, content_losses, style_losses
 
 def build_optimizer(output_size):
     input_img = autograd.Variable(torch.randn(output_size)).type(data.DTYPE)
@@ -141,22 +141,22 @@ def stylize(content_img, style_img, nsteps=500, content_weight=1, style_weight=1
 
     i = [0]
     while i[0] < nsteps:
-
+        
         def closure():
             input_param.data.clamp_(0, 1)
             optimizer.zero_grad()
             style_score, content_score = 0, 0
             model(input_param)
-            
+
             for loss in content_losses:
-                style_score += loss.backward()
-            for loss in style_losses:
                 content_score += loss.backward()
+            for loss in style_losses:
+                style_score += loss.backward()
 
             i[0] += 1
 
             if i[0] % 50 == 0: 
-                print("run {}:".format(run))
+                print("run {}:".format(i))
                 print('Style Loss : {:4f} Content Loss: {:4f}'.format(style_score.data[0], content_score.data[0]))
                 print()
 
@@ -174,6 +174,6 @@ style_img = data.load_style_image()
 #data.display_tensor(content_img, title='Content Image')
 #data.display_tensor(style_img, title='Style Image')
 
-output_img = stylize(content_img, style_img, nsteps=5)
+output_img = stylize(content_img, style_img)
 
 data.display_tensor(output_img, title='Output Image')
