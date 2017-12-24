@@ -9,7 +9,7 @@ import os
 
 HAS_CUDA = torch.cuda.is_available()
 DTYPE = torch.cuda.FloatTensor if HAS_CUDA else torch.FloatTensor
-IMSIZE = 512 if HAS_CUDA else 128
+IMSIZE = 512 #if HAS_CUDA else 128
 
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 CONTENT_PATH = os.path.join(BASE_PATH, '../data/images/content.jpg')
@@ -39,3 +39,16 @@ def display_tensor(tensor, title=None):
     if title is not None:
         plt.title(title)
     plt.show()
+
+def save_tensor(tensor, title=None):
+    to_tensor = tv.transforms.ToPILImage()
+    tensor = tensor.data
+    tensor = tensor.clone().cpu()
+    tensor = tensor.view(3, IMSIZE, IMSIZE)
+    image = to_tensor(tensor)
+
+    plt.figure()
+    plt.imshow(image)
+    if title is not None:
+        plt.title(title)
+    plt.savefig(title)

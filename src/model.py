@@ -174,6 +174,6 @@ style_img = data.load_style_image()
 #data.display_tensor(content_img, title='Content Image')
 #data.display_tensor(style_img, title='Style Image')
 
-output_img = stylize(content_img, style_img)
+output_img = stylize(content_img, style_img, nsteps=250)
 
 data.display_tensor(output_img, title='Output Image')
