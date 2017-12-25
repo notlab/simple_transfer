@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 import data
 
 DEFAULT_CONTENT_LAYERS = [ 'conv_4' ]
-DEFAULT_STYLE_LAYERS = [ 'conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5' ]
+#DEFAULT_STYLE_LAYERS = [ 'conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5' ]
+DEFAULT_STYLE_LAYERS = [ 'conv_4' ]
 
 ## Additional Layer Types
 class GramMatrix(nn.Module):
@@ -123,8 +124,12 @@ def build_model(content_img, style_img, content_weight=1, style_weight=1000, con
 
     return model, content_losses, style_losses
 
-def build_optimizer(output_size):
-    input_img = autograd.Variable(torch.randn(output_size)).type(data.DTYPE)
+def build_optimizer(output_size, seed=None):
+    if seed is not None:
+        input_img = seed
+    else:
+        input_img = autograd.Variable(torch.randn(output_size)).type(data.DTYPE)
+        
     input_param = nn.Parameter(input_img.data)
     optimizer = optim.LBFGS([input_param])
     return input_param, optimizer
@@ -132,13 +137,13 @@ def build_optimizer(output_size):
 ## Style transfer
 def stylize(content_img, style_img, nsteps=500, content_weight=1, style_weight=1000):
     print('Setting threads...')
-    torch.set_num_threads(32)
+    torch.set_num_threads(16)
     print('Number threads set to: %f' % torch.get_num_threads())
     
     print('Building model...')
 
     model, content_losses, style_losses = build_model(content_img, style_img, content_weight=content_weight, style_weight=style_weight)
-    input_param, optimizer = build_optimizer(content_img.data.size())
+    input_param, optimizer = build_optimizer(content_img.data.size(), seed=content_img)
 
     print('Done!')
     print('Transferring style...')
@@ -159,10 +164,9 @@ def stylize(content_img, style_img, nsteps=500, content_weight=1, style_weight=1
 
             i[0] += 1
 
-            if i[0] % 50 == 0: 
-                print("run {}:".format(i))
-                print('Style Loss : {:4f} Content Loss: {:4f}'.format(style_score.data[0], content_score.data[0]))
-                print()
+            print("run {}:".format(i))
+            print('Style Loss : {:4f} Content Loss: {:4f}'.format(style_score.data[0], content_score.data[0]))
+            print()
 
             return style_score + content_score
 
@@ -178,6 +182,6 @@ style_img = data.load_style_image()
 #data.display_tensor(content_img, title='Content Image')
 #data.display_tensor(style_img, title='Style Image')
 
-output_img = stylize(content_img, style_img, nsteps=250)
+output_img = stylize(content_img, style_img, nsteps=1)
 
-data.display_tensor(output_img, title='Output Image')
+data.save_tensor(output_img, title='output.jpg')
